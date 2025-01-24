@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepare_me_ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            color: #007bff;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        input[type="file"] {
+            font-size: 1em;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background-color: #f1f3f6;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: 600;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Concepts Cards */
+        #concepts {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .concept-card {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            width: calc(33% - 20px);
+            text-align: center;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            background-color: #e9ecef;
+        }
+
+        .concept-card a {
+            color: #007bff;
+            font-size: 1.1em;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Home Button */
+        #home {
+            height: 30px;
+            width: 30px;
+            background: url('https://cdn-icons-png.flaticon.com/128/9187/9187555.png') no-repeat center center;
+            background-size: contain;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        #home:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #loading {
+            display: none;
+            margin: 20px auto;
+            font-size: 1.2em;
+            color: #007bff;
+        }
+
+        #error {
+            display: none;
+            margin: 20px auto;
+            color: #e74c3c;
+            font-size: 1.1em;
+        }
+
+        #progressBar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        #progressBar div {
+            height: 15px;
+            width: 0;
+            background-color: #007bff;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .concept-card {
+                width: calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .concept-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <button id="home" onclick="location.href='/home.html'"></button>
+
+    <div class="container">
+        <h1>Prepare_me_ai</h1>
+
+        <!-- File Upload Form -->
+        <form id="uploadForm">
+            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+            <div id="progressBar"><div></div></div>
+            <button type="submit" class="btn">Upload PDF</button>
+        </form>
+
+        <!-- Loading Indicator -->
+        <div id="loading">Uploading and processing your PDF... Please wait.</div>
+
+        <!-- Error Message -->
+        <div id="error">An error occurred. Please try again later.</div>
+
+        <!-- Concepts Display Area -->
+        <div id="concepts"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const loadingIndicator = document.getElementById('loading');
+            const errorMessage = document.getElementById('error');
+            const progressBar = document.getElementById('progressBar').firstElementChild;
+            const conceptsDiv = document.getElementById('concepts');
+            const pdfFile = document.getElementById('pdfFile').files[0];
+
+            errorMessage.style.display = 'none';
+            conceptsDiv.innerHTML = '';
+            loadingIndicator.style.display = 'block';
+            progressBar.style.width = '0';
+
+            if (!pdfFile) {
+                errorMessage.textContent = "Please select a PDF file to upload.";
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('pdfFile', pdfFile);
+
+            try {
+                // Simulate file upload progress
+                let uploadProgress = 0;
+                const uploadInterval = setInterval(() => {
+                    uploadProgress += 20;
+                    progressBar.style.width = `${uploadProgress}%`;
+                    if (uploadProgress >= 100) clearInterval(uploadInterval);
+                }, 300);
+
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server error');
+                }
+
+                const data = await response.json();
+                const concepts = data.concepts;
+
+                sessionStorage.setItem('concepts', JSON.stringify(concepts));
+                sessionStorage.setItem('concatenatedText', data.concatenatedText);
+
+                displayConcepts(concepts);
+            } catch (error) {
+                errorMessage.textContent = 'Failed to upload or process the PDF. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        function displayConcepts(concepts) {
+            const conceptsDiv = document.getElementById('concepts');
+            conceptsDiv.innerHTML = '';
+
+            if (concepts.length === 0) {
+                conceptsDiv.textContent = 'No concepts found in the document.';
+                return;
+            }
+
+            concepts.forEach(concept => {
+                const card = document.createElement('div');
+                card.className = 'concept-card';
+
+                const link = document.createElement('a');
+                link.href = `/topic.html?concept=${encodeURIComponent(concept)}`;
+                link.textContent = concept;
+
+                // Add click event to track visit count
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    trackTopicVisit(concept);
+                    window.location.href = link.href;
+                });
+
+                card.appendChild(link);
+                conceptsDiv.appendChild(card);
+            });
+        }
+
+        // Track and display visit count for each topic
+        function trackTopicVisit(concept) {
+            let topicVisits = JSON.parse(sessionStorage.getItem('topicVisits')) || {};
+            
+            // Increase the count for the concept
+            topicVisits[concept] = (topicVisits[concept] || 0) + 1;
+            sessionStorage.setItem('topicVisits', JSON.stringify(topicVisits));
+
+            // Display the message to the user
+            const visitCount = topicVisits[concept];
+            console.log(`----------------${visitCount}----------------`);
+            alert(`This is the ${visitCount} time you are visiting this topic.`);
+            
+        }
+
+        window.onload = () => {
+            const storedConcepts = JSON.parse(sessionStorage.getItem('concepts'));
+            if (storedConcepts) {
+                displayConcepts(storedConcepts);
+            }
+        };
+    </script>
+
+</body>
+
+</html>

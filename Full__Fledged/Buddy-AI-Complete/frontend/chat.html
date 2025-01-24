@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            justify-content: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #007bff;
+            font-size: 2.5em;
+        }
+
+        #chat {
+            width: 90%;
+            max-width: 800px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #chat p {
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-radius: 20px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        /* User message styles */
+        #chat p.user {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Bot message styles */
+        #chat p.bot {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            color: black;
+        }
+
+        /* Message timestamp styles */
+        .timestamp {
+            font-size: 0.8em;
+            color: #777;
+            position: absolute;
+            bottom: -15px;
+            right: 10px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 140px);
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        #loading {
+            display: none;
+            font-size: 1em;
+            color: #007bff;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .clearBtn {
+            background-color: #ff4d4d;
+        }
+
+        .clearBtn:hover {
+            background-color: #c72c2c;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Chat</h1>
+    <div id="chat"></div>
+    <div id="loading">Sending your message...</div>
+    <div class="input-group">
+        <input type="text" id="question" placeholder="Ask a question" onkeypress="checkEnter(event)">
+        <button id="sendBtn" class="btn">Send</button>
+        <button id="clearBtn" class="clearBtn btn">Clear</button>
+        <button id="backBtn" class="btn">Back</button>
+    </div>
+
+    <script>
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('clearBtn').addEventListener('click', clearChat);
+
+        // Allow pressing Enter to send the message
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const questionInput = document.getElementById('question');
+            const question = questionInput.value.trim();
+
+            if (question === '') {
+                alert('Please enter a question.');
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const concept = urlParams.get('concept');
+            const text = sessionStorage.getItem('concatenatedText');
+            const explanation = urlParams.get('explanation');
+            const conversationHistory = sessionStorage.getItem('conversationHistory') || '';
+
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question, concept, text, explanation, conversationHistory })
+            });
+
+            const data = await response.json();
+            const chatDiv = document.getElementById('chat');
+
+            // Append user question with timestamp
+            const userTimestamp = new Date().toLocaleTimeString();
+            chatDiv.innerHTML += `<p class="user"><strong>You:</strong> ${question} <span class="timestamp">${userTimestamp}</span></p>`;
+
+            // Process bot response with timestamp
+            const botResponseLines = data.answer.split('\n').filter(line => line.trim() !== '');
+            const botResponse = botResponseLines.map(line => line.replace(/\*\*/g, '-').replace(/\*/g, '')).join('<br>');
+            const botTimestamp = new Date().toLocaleTimeString();
+            chatDiv.innerHTML += `<p class="bot"><strong>Bot:</strong> ${botResponse} <span class="timestamp">${botTimestamp}</span></p>`;
+
+            // Scroll to the bottom of the chat
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+
+            // Clear input
+            questionInput.value = '';
+
+            // Update conversation history
+            const newConversationHistory = conversationHistory + `You: ${question}\nBot: ${data.answer}\n`;
+            sessionStorage.setItem('conversationHistory', newConversationHistory);
+
+            // Hide loading indicator
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function clearChat() {
+            const chatDiv = document.getElementById('chat');
+            chatDiv.innerHTML = '';  // Clear the chat content
+            sessionStorage.setItem('conversationHistory', '');  // Clear the conversation history
+        }
+    </script>
+</body>
+
+</html>

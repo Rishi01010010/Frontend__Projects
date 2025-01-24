@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Processor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Image Text Processor</h1>
+            <p>Upload an image to extract, correct, and summarize text</p>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file-input" name="file" accept="image/*" required>
+                        <label for="file-input">
+                            <span class="file-input-text">Choose an image</span>
+                            <span class="file-input-button">Browse</span>
+                        </label>
+                    </div>
+                    <button type="submit" id="process-btn">Process Image</button>
+                </form>
+                <div id="loading" class="hidden">Processing... Please wait</div>
+            </div>
+
+            <div class="results-section hidden" id="results">
+                <div class="result-card">
+                    <h2>Extracted Text</h2>
+                    <div class="result-content" id="extracted-text"></div>
+                </div>
+
+                <div class="result-card">
+                    <h2>Corrected Text</h2>
+                    <div class="result-content" id="corrected-text"></div>
+                </div>
+
+                <div class="result-card">
+                    <h2>Summary</h2>
+                    <div class="result-content">
+                        <div id="summarized-text"></div>
+                        <button id="speak-button" class="speak-btn">
+                            <div class="button-content">
+                                <span class="speak-icon"></span>
+                                <span class="button-text">Read Summary</span>
+                            </div>
+                            <div class="sound-wave">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize speech synthesis
+        const synth = window.speechSynthesis;
+        let isPlaying = false;
+
+        function speakText(text) {
+            const speakButton = document.getElementById('speak-button');
+
+            if (isPlaying) {
+                synth.cancel();
+                isPlaying = false;
+                speakButton.innerHTML = `
+            <div class="button-content">
+                <span class="speak-icon"></span>
+                <span class="button-text">Read Summary</span>
+            </div>
+            <div class="sound-wave">
+                <span></span><span></span><span></span><span></span>
+            </div>`;
+                speakButton.setAttribute('data-playing', 'false');
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            utterance.onend = function () {
+                isPlaying = false;
+                speakButton.innerHTML = `
+            <div class="button-content">
+                <span class="speak-icon"></span>
+                <span class="button-text">Read Summary</span>
+            </div>
+            <div class="sound-wave">
+                <span></span><span></span><span></span><span></span>
+            </div>`;
+                speakButton.setAttribute('data-playing', 'false');
+            };
+
+            isPlaying = true;
+            speakButton.innerHTML = `
+        <div class="button-content">
+            <span class="speak-icon"></span>
+            <span class="button-text">Stop Reading</span>
+        </div>
+        <div class="sound-wave">
+            <span></span><span></span><span></span><span></span>
+        </div>`;
+            speakButton.setAttribute('data-playing', 'true');
+            synth.speak(utterance);
+        }
+
+        document.getElementById('speak-button').addEventListener('click', () => {
+            const text = document.getElementById('summarized-text').textContent;
+            speakText(text);
+        });
+
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            const fileInput = form.querySelector('input[type="file"]');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+
+            if (!fileInput.files.length) {
+                alert('Please select an image first');
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            // Show loading with animation
+            loading.classList.remove('hidden');
+            setTimeout(() => loading.classList.add('visible'), 10);
+
+            // Hide previous results with animation
+            results.style.opacity = '0';
+            results.style.transform = 'translateY(20px)';
+            results.classList.add('hidden');
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('extracted-text').textContent = data.extracted_text;
+                    document.getElementById('corrected-text').textContent = data.corrected_text;
+                    document.getElementById('summarized-text').textContent = data.summarized_text;
+
+                    // Show results with animation
+                    results.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                        results.classList.add('visible');
+                    });
+                } else {
+                    alert(data.error || 'An error occurred');
+                }
+            } catch (error) {
+                alert('An error occurred while processing the image');
+            } finally {
+                // Hide loading with animation
+                loading.classList.remove('visible');
+                setTimeout(() => loading.classList.add('hidden'), 300);
+            }
+        });
+
+        // Update file input label with selected filename
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name || 'Choose an image';
+            const label = e.target.parentElement.querySelector('.file-input-text');
+            label.textContent = fileName;
+
+            // Add animation class
+            label.style.animation = 'none';
+            requestAnimationFrame(() => {
+                label.style.animation = 'fadeIn 0.3s ease-out forwards';
+            });
+        });
+    </script>
+</body>
+
+</html>

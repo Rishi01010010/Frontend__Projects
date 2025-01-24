@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/posts">Home</a>
+    </div>
+    <div class="container">
+        <div class="form-card">
+            <h2>Edit Your Post</h2>
+            <p><strong>Post ID:</strong> <%= post.id %></p>
+            <p><strong>Username:</strong> @<%= post.username %></p>
+            <form method="POST" action="/posts/<%= post.id %>?_method=PATCH">
+                <textarea name="content" rows="8" required><%= post.content %></textarea>
+                <button class="btn">Submit Changes</button>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2025 Quora Clone
+    </div>
+</body>
+</html>

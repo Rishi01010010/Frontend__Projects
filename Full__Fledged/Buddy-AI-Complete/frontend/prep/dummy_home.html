@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepare Me AI</title>
+
+    <!-- Bootstrap and Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #cfd9df, #e2ebf0);
+            background-size: cover;
+        }
+
+        .glass-container {
+            width: 350px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            color: #007bff;
+        }
+
+        .glass-container img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        .btn-container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        /* Add hover effect for buttons */
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Glassmorphism Container -->
+    <div class="glass-container">
+        <h2>Prepare Me AI</h2>
+        <img class="image" src="att1.png" alt="Prepare Me AI Logo">
+        
+        <!-- Buttons for different actions -->
+        <div class="btn-container">
+            <form action="/prepare_me_ai">
+                <button type="submit" class="btn btn-secondary btn-lg">Prepare Me AI</button>
+            </form>
+            <form action="/story_telling">
+                <button type="submit" class="btn btn-secondary btn-lg">Story Telling</button>
+            </form>
+            <form action="../simon/game.html">
+                <button type="submit" class="btn btn-primary btn-lg">Memory Game</button>
+            </form>
+            <form action="/fun_fact">
+                <button type="submit" class="btn btn-secondary btn-lg">Fun Fact</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+RpDBloJljXcflG8KE9fIlSAWzY6p" crossorigin="anonymous">
+    </script>
+
+</body>
+
+</html>

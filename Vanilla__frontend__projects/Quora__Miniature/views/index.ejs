@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quora-Inspired Posts</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <div>Quora Clone</div>
+        <div>
+            <a href="/posts">Home</a>
+            <a href="/posts/new">New Post</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Explore Topics</h3>
+            <ul>
+                <li><a href="#">Technology</a></li>
+                <li><a href="#">Science</a></li>
+                <li><a href="#">Education</a></li>
+                <li><a href="#">Business</a></li>
+                <li><a href="#">Lifestyle</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Posts</h1>
+            <% if (posts.length === 0) { %>
+                <p>No posts available. Start by creating one!</p>
+            <% } else { %>
+                <% posts.forEach(post => { %>
+                    <div class="post">
+                        <h3>@<%= post.username %></h3>
+                        <p class="content"><%= post.content %></p>
+                        <a href="/posts/<%= post.id %>" class="btn">View</a>
+                        <a href="/posts/<%= post.id %>/edit" class="btn">Edit</a>
+                        <form method="post" action="/posts/<%= post.id %>?_method=DELETE">
+                            <button style="margin-top: 25px;">Delete</button>
+                        </form>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 Quora Clone. All rights reserved.
+    </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+/* body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-image: url('worstlock.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+} */
+
+body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-image: url('blacklock.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+body {
+    /* ... */
+    background-position: top center;
+}
+
+
+
+
+.container {
+    /* background-color: #fff; */
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    -webkit-backdrop-filter: blur(8px);  /* Safari 9+ */
+    backdrop-filter: blur(8px); /* Chrome and Opera */
+    box-shadow: 0px 10px 15px 10px rgb(0 0 0 / 15%);
+    background-color: rgb(228 228 228 / 15%); 
+
+}
+
+input, button {
+    margin: 10px 0;
+    padding: 8px;
+    width: 100%;
+}
+
+button {
+    background-color: transparent;
+    color: #fff;
+    border: 2px white solid;
+    border-radius: 25px;
+    cursor: pointer;
+    text-size-adjust: 5px;
+    font-size: 15px;
+}
+
+button:hover {
+    box-shadow: 0 0 10px white;
+}
+
+
+/* #masterPassword{
+    padding: 0px;
+    height: 25px;
+    background-color: transparent;
+    border-radius: 5px;
+    border: 2px white solid;
+} */
+
+
+#masterPassword {
+    padding: 0px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0); /* Fully transparent white background */
+    border-radius: 5px;
+    border: 2px white solid;
+    color: white; /* Set text color to white */
+    font-size-adjust: 5px;
+    text-align: center;
+}
+#masterPassword::placeholder {
+    color: white; /* Change the color to your desired placeholder color */
+}
+
+
+#accountName{
+    padding: 0px;
+    height: 30px;
+    font-size: 20px;
+    text-align: center;
+}

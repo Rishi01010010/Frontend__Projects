@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        form {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="number"],
+        select {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button[type="submit"],
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        button[type="submit"]:hover,
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #questions {
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #questions div {
+            margin-bottom: 15px;
+        }
+
+        #questions div p {
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        #backBtn {
+            margin-top: 20px;
+        }
+
+        .loading {
+            display: none;
+            font-size: 1.5em;
+            color: #007bff;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Take Test</h1>
+        <form id="testForm">
+            <label for="numQuestions">Number of Questions:</label>
+            <input type="number" id="numQuestions" name="numQuestions" required min="1">
+
+            <label for="type">Type of Questions:</label>
+            <select id="type" name="type">
+                <option value="short answer">Short Answer</option>
+                <option value="long answer">Long Answer</option>
+            </select>
+
+            <label for="level">Difficulty Level:</label>
+            <select id="level" name="level">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <button type="submit"><i class="fas fa-paper-plane"></i> Get Questions</button>
+        </form>
+        <div id="questions"></div>
+        <button id="backBtn"><i class="fas fa-times"></i> End Test</button>
+        <div id="loading" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+    </div>
+
+    <script>
+        document.getElementById('backBtn').addEventListener('click', () => {
+            if (confirm("Are you sure you want to end the test?")) {
+                window.history.back();
+            }
+        });
+
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const concept = new URLSearchParams(window.location.search).get('concept');
+            const numQuestions = formData.get('numQuestions');
+            const type = formData.get('type');
+            const level = formData.get('level');
+
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+
+            // Fetch questions from the server
+            const response = await fetch('/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    numQuestions: numQuestions,
+                    type: type,
+                    level: level,
+                    concept: concept
+                })
+            });
+
+            document.getElementById('loading').style.display = 'none'; // Hide loading indicator
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('Error fetching questions:', error);
+                alert('Error fetching questions: ' + error.message);
+                return;
+            }
+
+            const data = await response.json();
+            const questionsDiv = document.getElementById('questions');
+            questionsDiv.innerHTML = '';
+
+            // Filter out empty questions
+            const filteredQuestions = data.questions.filter(question => question.trim() !== '');
+
+            if (filteredQuestions.length === 0) {
+                questionsDiv.innerHTML = '<p>No questions available.</p>';
+                return;
+            }
+
+            filteredQuestions.forEach((question, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.innerHTML = `<p>${index + 1}. ${question}</p><textarea placeholder="Your answer here"></textarea>`;
+                questionsDiv.appendChild(questionEl);
+            });
+
+            // Add the Submit button
+            const submitBtn = document.createElement('button');
+            submitBtn.textContent = 'Submit Answers';
+            submitBtn.addEventListener('click', async () => {
+                const answers = Array.from(questionsDiv.querySelectorAll('textarea')).map((textarea, index) => ({
+                    question: filteredQuestions[index],
+                    answer: textarea.value
+                }));
+
+                // Show loading indicator
+                document.getElementById('loading').style.display = 'block';
+
+                const response = await fetch('/evaluate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answers })
+                });
+
+                document.getElementById('loading').style.display = 'none'; // Hide loading indicator
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error('Error submitting answers:', error);
+                    alert('Error submitting answers: ' + error.message);
+                    return;
+                }
+
+                const result = await response.json();
+                const evaluationArray = result.evaluation.split('\n');
+                questionsDiv.innerHTML = '';
+                evaluationArray.forEach(line => {
+                    const formattedLine = line.replace(/\*\*/g, '-').replace(/\*/g, '');
+                    const lineEl = document.createElement('p');
+                    lineEl.textContent = formattedLine;
+                    questionsDiv.appendChild(lineEl);
+                });
+            });
+            questionsDiv.appendChild(submitBtn);
+        });
+    </script>
+</body>
+
+</html>

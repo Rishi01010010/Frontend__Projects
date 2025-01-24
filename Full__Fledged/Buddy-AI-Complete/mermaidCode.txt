@@ -1,0 +1,14 @@
+
+
+graph TD
+A[Web Application] --> B(Database);
+B --> C[Product Information];
+B --> D[User Preferences];
+B --> E[Inventory Levels];
+C --> F[Dynamic Product Display];
+D --> G[Personalized Recommendations];
+E --> H[Inventory Status Updates];
+F --> A;
+G --> A;
+H --> A;
+

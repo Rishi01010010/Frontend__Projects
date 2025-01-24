@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post in Detail</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/posts">Home</a>
+    </div>
+    <div class="container">
+        <div class="post-detail-card">
+            <h2>Post Details</h2>
+            <p><strong>Post ID:</strong> <%= post.id %></p>
+            <div class="post">
+                <h3 class="user">@<%= post.username %></h3>
+                <p class="content"><%= post.content %></p>
+            </div>
+            <div class="actions">
+                <a href="/posts/<%= post.id %>/edit" class="btn">Edit</a>
+                <form method="post" action="/posts/<%= post.id %>?_method=DELETE">
+                    <button class="btn">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2025 Quora Clone
+    </div>
+</body>
+</html>

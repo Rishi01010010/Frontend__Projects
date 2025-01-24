@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+            padding: 10px 20px;
+            background-color: #f2f2f2;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .mini-photo-container {
+            margin-top: 10px;
+        }
+
+        .mini-photo-container img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+        #home {
+            height: 30px;
+            width: 30px;
+            background: url('https://cdn-icons-png.flaticon.com/128/9187/9187555.png') no-repeat center center;
+            background-size: contain;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            /* margin: 5px; */
+        }
+
+        #home:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #home:active {
+            transform: scale(0.9);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <form action="/attendance" method="get">
+        <input type="image" id="home" src="https://cdn-icons-png.flaticon.com/128/9187/9187555.png" alt="Home">
+    </form> -->
+    <button id="home" onclick="location.href='/..'"></button>
+    <h3>Add new Student</h3>
+    <form method="POST" action="/attendance" enctype="multipart/form-data">
+        <label for="studphoto" class="file-upload">
+            <input name="student[photo]" type="file" id="studphoto" accept="image/*" onchange="showMiniPhoto(this)">
+            <span>Choose a photo</span>
+            <div class="mini-photo-container">
+                <img id="mini-photo">
+            </div>
+        </label>
+
+        <input name="student[name]" placeholder="Enter Name" type="text">
+        <input name="student[roll_number]" placeholder="Enter Roll Number" type="text">
+        <button>Add</button>
+    </form>
+
+    <script>
+        function showMiniPhoto(input) {
+            var file = input.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var miniPhoto = document.getElementById('mini-photo');
+                miniPhoto.src = e.target.result;
+                var miniPhotoContainer = document.querySelector('.mini-photo-container');
+                miniPhotoContainer.style.display = 'block'; // Show the mini photo container
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+    </script>
+</body>
+
+</html>
